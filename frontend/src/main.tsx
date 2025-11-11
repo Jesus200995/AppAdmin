@@ -6,8 +6,9 @@ import { AuthProvider } from './app/auth'
 import { router } from './app/router'
 import { queryClient } from './app/queryClient'
 
-import { registerSW } from 'virtual:pwa-register'
-registerSW({ immediate: true })
+// Deshabilitado: Service Worker para evitar conflictos en desarrollo
+// import { registerSW } from 'virtual:pwa-register'
+// registerSW({ immediate: true })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
