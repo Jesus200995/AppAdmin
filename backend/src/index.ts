@@ -16,20 +16,25 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || '*'
 // Middleware CORS personalizado (sin librerías externas)
 app.use((req, res, next) => {
   const origin = CORS_ORIGIN
+  const reqOrigin = req.headers.origin || ''
+  
   if (origin === '*') {
     res.header('Access-Control-Allow-Origin', '*')
   } else {
-    // Si origin tiene múltiples valores, envía el primero que coincida
     const allowedOrigins = origin.split(',').map(o => o.trim())
-    const reqOrigin = req.headers.origin
-    if (reqOrigin && allowedOrigins.includes(reqOrigin)) {
+    if (allowedOrigins.includes(reqOrigin)) {
       res.header('Access-Control-Allow-Origin', reqOrigin)
+    } else if (allowedOrigins.length > 0) {
+      // Si no coincide pero hay orígenes permitidos, usa el primero
+      res.header('Access-Control-Allow-Origin', allowedOrigins[0])
     }
   }
+  
   res.header('Vary', 'Origin')
   res.header('Access-Control-Allow-Credentials', 'true')
   res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS')
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+  
   if (req.method === 'OPTIONS') return res.sendStatus(204)
   next()
 })
