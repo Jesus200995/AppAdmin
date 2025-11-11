@@ -14,7 +14,17 @@ const app = express()
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*'
 
-app.use(cors({ origin: CORS_ORIGIN }))
+// Procesa múltiples orígenes si vienen separados por comas
+const allowedOrigins = CORS_ORIGIN === '*' 
+  ? '*' 
+  : CORS_ORIGIN.split(',').map(o => o.trim())
+
+app.use(cors({ 
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}))
 app.use(express.json())
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, uptime: process.uptime() }))
