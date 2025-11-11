@@ -1,6 +1,5 @@
 import 'dotenv/config'
 import express from 'express'
-import cors from 'cors'
 import authRoutes from './routes/auth'
 import userRoutes from './routes/users'
 import usersAdminRoutes from './routes/users-admin'
@@ -14,17 +13,27 @@ const app = express()
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*'
 
-// Procesa múltiples orígenes si vienen separados por comas
-const allowedOrigins = CORS_ORIGIN === '*' 
-  ? '*' 
-  : CORS_ORIGIN.split(',').map(o => o.trim())
+// Middleware CORS personalizado (sin librerías externas)
+app.use((req, res, next) => {
+  const origin = CORS_ORIGIN
+  if (origin === '*') {
+    res.header('Access-Control-Allow-Origin', '*')
+  } else {
+    // Si origin tiene múltiples valores, envía el primero que coincida
+    const allowedOrigins = origin.split(',').map(o => o.trim())
+    const reqOrigin = req.headers.origin
+    if (reqOrigin && allowedOrigins.includes(reqOrigin)) {
+      res.header('Access-Control-Allow-Origin', reqOrigin)
+    }
+  }
+  res.header('Vary', 'Origin')
+  res.header('Access-Control-Allow-Credentials', 'true')
+  res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS')
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+  if (req.method === 'OPTIONS') return res.sendStatus(204)
+  next()
+})
 
-app.use(cors({ 
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}))
 app.use(express.json())
 
 app.get('/api/health', (_req, res) => res.json({ ok: true, uptime: process.uptime() }))
