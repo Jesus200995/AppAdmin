@@ -2,51 +2,26 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// Configuración de Vite + PWA
 export default defineConfig({
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      devOptions: { enabled: true }, // SW también en dev (útil para probar)
-      includeAssets: ['icons/icon-192.png', 'icons/icon-512.png'],
+      includeAssets: ['favicon.ico', 'robots.txt'],
       manifest: {
-        name: 'Sistema de Administración',
-        short_name: 'Admin',
+        name: 'Admin App',
+        short_name: 'AdminApp',
         start_url: '/',
-        scope: '/',
         display: 'standalone',
+        theme_color: '#0ea5e9',
         background_color: '#ffffff',
-        theme_color: '#0f172a',
-        description: 'PWA offline con roles, mapa y sincronización',
         icons: [
-          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' }
-        ]
-      },
-      workbox: {
-        // Ajustes iniciales de cache
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        runtimeCaching: [
-          // API propia (la apuntaremos a /api desde el backend)
-          {
-            urlPattern: ({ url }) => url.pathname.startsWith('/api'),
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              networkTimeoutSeconds: 10,
-              cacheableResponse: { statuses: [0, 200] }
-            }
-          },
-          // Tiles/mapas e imágenes
-          {
-            urlPattern: ({ url }) =>
-              url.hostname.includes('tile.openstreetmap.org') ||
-              url.pathname.match(/\.(png|jpg|jpeg|svg|webp|ico)$/),
-            handler: 'StaleWhileRevalidate',
-            options: { cacheName: 'assets-cache' }
-          }
+          { src: 'pwa-192x192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'pwa-512x512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'pwa-512x512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'any maskable' }
         ]
       }
     })
-  ],
+  ]
 })
