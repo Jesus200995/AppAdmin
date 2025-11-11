@@ -7,6 +7,8 @@ import usersAdminRoutes from './routes/users-admin'
 import changeSuperiorRoutes from './routes/change-superior'
 import validateRoutes from './routes/validate'
 import importRoutes from './routes/import'
+import metricsRoutes from './routes/metrics'
+import mapRoutes from './routes/map'
 
 const app = express()
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000
@@ -23,6 +25,8 @@ app.use('/api/admin/users', usersAdminRoutes)
 app.use('/api/change-superior', changeSuperiorRoutes)
 app.use('/api/validate', validateRoutes)
 app.use('/api/import', importRoutes)
+app.use('/api/metrics', metricsRoutes)
+app.use('/api/map', mapRoutes)
 
 app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`)

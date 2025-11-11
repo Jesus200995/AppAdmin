@@ -96,3 +96,20 @@ export async function importUsers(items: any[]) {
     { method: 'POST', body: JSON.stringify({ items }) }
   )
 }
+
+export async function getOverviewMetrics() {
+  return apiFetch<{
+    byRole: Record<string, number>,
+    pending: number,
+    topSup: Array<{ id: string; nombre: string; role: string; _count: { subalternos: number } }>
+  }>('/api/metrics/overview')
+}
+
+export async function getMapUsers(params: { role?: string; superiorId?: string }) {
+  const q = new URLSearchParams()
+  if (params.role) q.set('role', params.role)
+  if (params.superiorId) q.set('superiorId', params.superiorId)
+  return apiFetch<Array<{ id: string; nombre: string; email: string; role: string; superiorId?: string }>>(
+    `/api/map/users?${q.toString()}`
+  )
+}
