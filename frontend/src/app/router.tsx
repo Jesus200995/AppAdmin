@@ -3,11 +3,16 @@ import AppLayout from '../ui/AppLayout'
 import LoginPage from '../features/auth/LoginPage'
 import DashboardPage from '../ui/DashboardPage'
 import MapaPage from '../features/mapa/MapaPage'
+import Protected from './Protected'
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <AppLayout />,
+    element: (
+      <Protected>
+        <AppLayout />
+      </Protected>
+    ),
     children: [
       { index: true, element: <DashboardPage /> },
       { path: 'mapa', element: <MapaPage /> },
@@ -15,3 +20,4 @@ export const router = createBrowserRouter([
   },
   { path: '/login', element: <LoginPage /> },
 ])
+

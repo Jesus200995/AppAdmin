@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -19,6 +19,12 @@ enum Role {
   ADMIN
 }
 
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 model User {
   id           String   @id @default(cuid())
   email        String   @unique
@@ -29,6 +35,56 @@ model User {
   superiorId   String?
   superior     User?    @relation("UserSuperior", fields: [superiorId], references: [id])
   subalternos  User[]   @relation("UserSuperior")
+
+  // trazabilidad
+  actions      ActionLog[]
+
+  // solicitudes donde es solicitante
+  changeSuperiorRequests ChangeSuperiorRequest[] @relation("Requester")
+
+  // solicitudes donde es nuevo superior
+  asNewSuperior ChangeSuperiorRequest[] @relation("NewSuperior")
+
+  // solicitudes donde es aprobador
+  approvingRequests ChangeSuperiorRequest[] @relation("Approver")
+
+  // solicitudes donde fue quien decidió
+  decidedRequests ChangeSuperiorRequest[] @relation("DecidedBy")
+
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+model ChangeSuperiorRequest {
+  id            String        @id @default(cuid())
+  requesterId   String
+  requester     User          @relation("Requester", fields: [requesterId], references: [id])
+
+  // a quién quieren reportar ahora
+  newSuperiorId String
+  newSuperior   User          @relation("NewSuperior", fields: [newSuperiorId], references: [id])
+
+  // quién debe aprobar
+  approverId    String?
+  approver      User?         @relation("Approver", fields: [approverId], references: [id])
+
+  status        RequestStatus @default(PENDING)
+  reason        String?
+  decidedById   String?
+  decidedBy     User?         @relation("DecidedBy", fields: [decidedById], references: [id])
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+model ActionLog {
+  id         String   @id @default(cuid())
+  actorId    String
+  actor      User     @relation(fields: [actorId], references: [id])
+  entity     String   // 'User' | 'ChangeSuperiorRequest' | etc.
+  entityId   String
+  action     String   // 'REQUEST_CHANGE_SUPERIOR' | 'APPROVE' | 'REJECT' | 'UPDATE_SUPERIOR' ...
+  details    String?  // JSON string
+  createdAt  DateTime @default(now())
+}
+

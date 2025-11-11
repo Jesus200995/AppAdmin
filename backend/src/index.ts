@@ -3,6 +3,10 @@ import express from 'express'
 import cors from 'cors'
 import authRoutes from './routes/auth'
 import userRoutes from './routes/users'
+import usersAdminRoutes from './routes/users-admin'
+import changeSuperiorRoutes from './routes/change-superior'
+import validateRoutes from './routes/validate'
+import importRoutes from './routes/import'
 
 const app = express()
 const PORT = process.env.PORT ? Number(process.env.PORT) : 3000
@@ -15,7 +19,13 @@ app.get('/api/health', (_req, res) => res.json({ ok: true, uptime: process.uptim
 
 app.use('/api/auth', authRoutes)
 app.use('/api/users', userRoutes)
+app.use('/api/admin/users', usersAdminRoutes)
+app.use('/api/change-superior', changeSuperiorRoutes)
+app.use('/api/validate', validateRoutes)
+app.use('/api/import', importRoutes)
 
 app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`)
 })
+
+

@@ -1,17 +1,23 @@
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
+import { useAuth } from '../app/auth'
+import { useSyncQueue } from '../offline/useSyncQueue'
 
 export default function AppLayout() {
   const nav = useNavigate()
   const [open, setOpen] = useState(false)
+  const { user, logout } = useAuth()
+
+  useSyncQueue()
 
   return (
     <div style={{ minHeight: '100dvh', display: 'grid', gridTemplateRows: 'auto 1fr' }}>
       <header style={{ display: 'flex', alignItems: 'center', gap: 12, padding: 12, borderBottom: '1px solid #e5e7eb' }}>
         <button onClick={() => setOpen(o => !o)} aria-label="menu">☰</button>
         <Link to="/" style={{ fontWeight: 700 }}>Admin</Link>
-        <div style={{ marginLeft: 'auto', display: 'flex', gap: 8 }}>
-          <button onClick={() => nav('/login')}>Salir</button>
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: 12, alignItems: 'center' }}>
+          {user && <span style={{ opacity: .8 }}>{user.nombre} — {user.role}</span>}
+          <button onClick={() => { logout(); nav('/login') }}>Salir</button>
         </div>
       </header>
 
@@ -29,3 +35,5 @@ export default function AppLayout() {
     </div>
   )
 }
+
+
